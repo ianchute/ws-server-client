@@ -6,10 +6,10 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <script src="../socket.js" charset="utf-8"></script>
     <script type="text/javascript">
-      window.chatText = document.getElementById('chatText');
-      window.chatSend = document.getElementById('chatSend');
-      window.chatBox = document.getElementById('chatBox');
-      window.socket = new Socket({
+      const chatText = document.getElementById('chatText');
+      const chatSend = document.getElementById('chatSend');
+      const chatBox = document.getElementById('chatBox');
+      const socket = new Socket({
         ip: '199.180.128.101',
         port: '13579',
         onmessage: ({ data, timeStamp }) => {
@@ -21,7 +21,7 @@
       };
     </script>
   </head>
-  <body>
+  <body class="container">
     <div class="row">
       <div class="col-md-6 form-group">
         <input id="chatText"
