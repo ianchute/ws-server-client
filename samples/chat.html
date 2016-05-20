@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Kikaric Chat</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="../socket.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      window.chatText = document.getElementById('chatText');
+      window.chatSend = document.getElementById('chatSend');
+      window.chatBox = document.getElementById('chatBox');
+      window.socket = new Socket({
+        ip: '199.180.128.101',
+        port: '13579',
+        onmessage: ({ data, timeStamp }) => {
+          chatBox.innerHTML += `${timeStamp} ${data}\n`;
+        }
+      });
+      chatSend.onclick = (ev) => {
+        socket.send(chatText.value);
+      };
+    </script>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col-md-6 form-group">
+        <input id="chatText"
+          class="form-control"
+          type="text"
+          value=""
+          placeholder="Type chat here">
+        <button id="chatSend"
+          class="btn btn-primary"
+          type="button"
+          name="button">Send</button>
+      </div>
+      <div class="col-md-6 form-group">
+        <textarea id="chatBox"
+          class="form-control"
+          name="name"
+          rows="8"
+          cols="40">
+        </textarea>
+      </div>
+    </div>
+  </body>
+</html>
