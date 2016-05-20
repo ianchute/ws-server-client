@@ -17,7 +17,7 @@
 const int WSI_LIST_LIMIT = 10;
 static int destroy_flag = 0;
 static int wsi_count = 0;
-static struct lws* wsi_list[WSI_LIST_LIMIT];
+static struct lws* wsi_list[10];
 
 static void INT_HANDLER(int signo) {
   destroy_flag = 1;
@@ -80,7 +80,7 @@ static int ws_service_callback(
       //* echo back to client*/
       int i = 0;
       for(i = 0; i < WSI_LIST_LIMIT; ++i) {
-        if (wsi_list[i] != NULL) {
+        if (wsi_list[i] != NULL && wsi_list[i] != wsi) {
           websocket_write_back(wsi_list[i], (char *)in, -1);
         }
       }
