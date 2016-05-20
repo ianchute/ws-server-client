@@ -14,7 +14,10 @@
 #define KCYN_L "\033[1;36m"
 #define RESET "\033[0m"
 
+const int WSI_LIST_LIMIT = 10;
 static int destroy_flag = 0;
+static int wsi_count = 0;
+static struct lws* wsi_list[WSI_LIST_LIMIT];
 
 static void INT_HANDLER(int signo) {
   destroy_flag = 1;
@@ -59,11 +62,15 @@ int websocket_write_back(
 
 static int ws_service_callback(
   struct lws *wsi,
-  enum lws_callback_reasons reason, void *user,
+  enum lws_callback_reasons reason,
+  void *user,
   void *in, size_t len
 ) {
   switch (reason) {
     case LWS_CALLBACK_ESTABLISHED:
+      if (wsi_count - 1 < WSI_LIST_LIMIT) {
+        wsi_list[wsi_count++] = wsi;
+      }
       printf(KYEL"[Main Service] Connection established\n"RESET);
       break;
 
@@ -71,7 +78,12 @@ static int ws_service_callback(
     case LWS_CALLBACK_RECEIVE:
       printf(KCYN_L"[Main Service] Server recvived:%s\n"RESET,(char *)in);
       //* echo back to client*/
-      websocket_write_back(wsi, (char *)in, -1);
+      int i = 0;
+      for(i = 0; i < WSI_LIST_LIMIT; ++i) {
+        if (wsi_list[i] != NULL) {
+          websocket_write_back(wsi_list[i], (char *)in, -1);
+        }
+      }
       break;
 
     case LWS_CALLBACK_CLOSED:

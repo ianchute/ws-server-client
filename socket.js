@@ -12,6 +12,7 @@ class Socket {
       this.debug = debug;
       this.onmessage = onmessage || ((response) => logResponse(response));
       this.oldSockets = [];
+      this.queue = [];
       this.ensureCreation();
     } else {
       throw new Error('WebSocket is not supported!');
@@ -59,7 +60,6 @@ class Socket {
     this.log('Binding events...');
     this.socket.onmessage = (response) => this.onmessage(response);
     this.socket.onclose = () => this.ensureCreation();
-    this.queue = this.queue || [];
     this.resendQueuedMessages();
     this.disposeOldSockets();
   }
