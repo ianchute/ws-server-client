@@ -15,9 +15,9 @@
 #define RESET "\033[0m"
 
 const int WSI_LIST_LIMIT = 10;
+static struct lws* wsi_list[10];
 static int destroy_flag = 0;
 static int wsi_count = 0;
-static struct lws* wsi_list[10];
 
 static void INT_HANDLER(int signo) {
   destroy_flag = 1;
@@ -69,7 +69,23 @@ static int ws_service_callback(
   switch (reason) {
     case LWS_CALLBACK_ESTABLISHED:
       if (wsi_count - 1 < WSI_LIST_LIMIT) {
-        wsi_list[wsi_count++] = wsi;
+        int i = 0;
+        bool exists = false;
+        for(i = 0; i < WSI_LIST_LIMIT; ++i) {
+          if (wsi_list[i] == wsi) {
+            found = true;
+            break;
+          }
+        }
+        if (!exists) {
+          for(i = 0; i < WSI_LIST_LIMIT; ++i) {
+            if (wsi_list[i] == NULL) {
+              wsi_list[i] = wsi;
+              wsi_count++;
+              break;
+            }
+          }
+        }
       }
       printf(KYEL"[Main Service] Connection established\n"RESET);
       break;
@@ -87,6 +103,14 @@ static int ws_service_callback(
       break;
 
     case LWS_CALLBACK_CLOSED:
+      int i = 0;
+      for(i = 0; i < WSI_LIST_LIMIT; ++i) {
+        if (wsi_list[i] == wsi) {
+          free(wsi_list[i]);
+          wsi_list[i] = NULL;
+          wsi_count--;
+        }
+      }
       printf(KYEL"[Main Service] Client close.\n"RESET);
       break;
 
