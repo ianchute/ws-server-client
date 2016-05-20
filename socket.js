@@ -129,9 +129,3 @@ class Socket {
     }, callback);
   }
 }
-
-const socket = new Socket({
-  ip: '199.180.128.101',
-  port: '13579',
-  debug: true,
-});
