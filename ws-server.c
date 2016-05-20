@@ -18,6 +18,8 @@ const int WSI_LIST_LIMIT = 10;
 static struct lws* wsi_list[10];
 static int destroy_flag = 0;
 static int wsi_count = 0;
+static int i = 0;
+static int exists = 0;
 
 static void INT_HANDLER(int signo) {
   destroy_flag = 1;
@@ -68,16 +70,15 @@ static int ws_service_callback(
 ) {
   switch (reason) {
     case LWS_CALLBACK_ESTABLISHED:
+      exists = 0;
       if (wsi_count - 1 < WSI_LIST_LIMIT) {
-        int i = 0;
-        bool exists = false;
         for(i = 0; i < WSI_LIST_LIMIT; ++i) {
           if (wsi_list[i] == wsi) {
-            found = true;
+            exists = 1;
             break;
           }
         }
-        if (!exists) {
+        if (exists == 1) {
           for(i = 0; i < WSI_LIST_LIMIT; ++i) {
             if (wsi_list[i] == NULL) {
               wsi_list[i] = wsi;
@@ -94,7 +95,6 @@ static int ws_service_callback(
     case LWS_CALLBACK_RECEIVE:
       printf(KCYN_L"[Main Service] Server recvived:%s\n"RESET,(char *)in);
       //* echo back to client*/
-      int i = 0;
       for(i = 0; i < WSI_LIST_LIMIT; ++i) {
         if (wsi_list[i] != NULL && wsi_list[i] != wsi) {
           websocket_write_back(wsi_list[i], (char *)in, -1);
@@ -103,7 +103,6 @@ static int ws_service_callback(
       break;
 
     case LWS_CALLBACK_CLOSED:
-      int i = 0;
       for(i = 0; i < WSI_LIST_LIMIT; ++i) {
         if (wsi_list[i] == wsi) {
           free(wsi_list[i]);
